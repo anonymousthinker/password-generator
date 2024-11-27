@@ -1,37 +1,32 @@
 const BOX_SIZE = 32;
 const SPACE_SIZE = 45;
 const LENGTH = 20;
+const BAR = '▐';
+
+function generateRandom(to, from) {
+  return from + Math.floor((Math.random() * (to - from)));
+}
 
 function delay() {
   for (let i = 0; i < 400000000; i++) { };
 }
 
-function animate(times) {
-  if (times === 0) {
-    return;
+function animate() {
+  let times = 16;
+  let index = 1;
+  while (times > 0) {
+    console.clear();
+    console.log(printLoading(index));
+    delay();
+    index += 1;
+    times -= 1;
+    index = index > 4 ? 1 : index;
   }
-
-  console.clear();
-  createLoadingOne();
-  delay();
-  console.clear();
-  createLoadingTwo();
-  delay();
-  console.clear();
-  createLoadingThree();
-  delay();
-  console.clear();
-  createLoadingFour();
-  delay();
-  console.clear();
-  createLoadingFive();
-  delay();
-  console.clear();
-
-  return animate(times - 1);
 }
 
-function createTopForAll(string) {
+function createTopBorder() {
+  let string = '┏';
+
   for (let index = 0; index < LENGTH; index++) {
     string += '━';
   }
@@ -39,15 +34,19 @@ function createTopForAll(string) {
   return string + '┓';
 }
 
-function createMiddleForAll(string, length, symbol) {
-  for (let index = 0; index < length; index++) {
-    string += symbol;
+function createBody(length, symbol) {
+  let string = '┃';
+
+  for (let index = 0; index < LENGTH; index++) {
+    string += index < length ? symbol : ' ';
   }
 
   return string + '┃';
 }
 
-function createBottomForAll(string) {
+function createBottomBorder() {
+  let string = '┗';
+
   for (let index = 0; index < LENGTH; index++) {
     string += '━';
   }
@@ -55,77 +54,25 @@ function createBottomForAll(string) {
   return string + '┛';
 }
 
-function createLoadingOne() {
-  console.log('Generating.')
-  const loadingOneTop = createTopForAll('┏');
-  const loadingOneMiddle = createMiddleForAll('┃▐▐', LENGTH - '▐▐'.length, ' ');
-  const loadingOneBottom = createBottomForAll('┗');
+function createLoading(length) {
+  const topBorder = createTopBorder();
+  const bottomBorder = createBottomBorder();
+  const middlePart = createBody(length, BAR);
 
-  console.log(loadingOneTop);
-  console.log(loadingOneMiddle);
-  console.log(loadingOneBottom);
+  return topBorder + '\n' + middlePart + '\n' + bottomBorder;
 }
-
-function createLoadingTwo() {
-  console.log('Generating..')
-  const loadingOneTop = createTopForAll('┏');
-  const loadingOneBottom = createBottomForAll('┗');
-  
-  let loadingBars = '';
-  for (let index = 0; index < LENGTH - 15; index++) {
-    loadingBars += '▐';
+ 
+function printLoading(number) {
+  switch (number) {
+    case 1:
+      return createLoading(2);
+    case 2:
+      return createLoading(8);
+    case 3:
+      return createLoading(14);
+    case 4:
+      return createLoading(20);
   }
-  
-  const loadingOneMiddle = createMiddleForAll('┃' + loadingBars, LENGTH - loadingBars.length, ' ');
-
-  console.log(loadingOneTop);
-  console.log(loadingOneMiddle);
-  console.log(loadingOneBottom);
-}
-
-function createLoadingThree() {
-  console.log('Generating...')
-  const loadingOneTop = createTopForAll('┏');
-  const loadingOneBottom = createBottomForAll('┗');
-  
-  let loadingBars = '';
-  for (let index = 0; index < LENGTH - 10; index++) {
-    loadingBars += '▐';
-  }
-  
-  const loadingOneMiddle = createMiddleForAll('┃' + loadingBars, LENGTH - loadingBars.length, ' ');
-  
-  console.log(loadingOneTop);
-  console.log(loadingOneMiddle);
-  console.log(loadingOneBottom);
-}
-
-function createLoadingFour() {
-  console.log('Generating.')
-  const loadingOneTop = createTopForAll('┏');
-  const loadingOneBottom = createBottomForAll('┗');
-  
-  let loadingBars = '';
-  for (let index = 0; index < LENGTH - 5; index++) {
-    loadingBars += '▐';
-  }
-  
-  const loadingOneMiddle = createMiddleForAll('┃' + loadingBars, LENGTH - loadingBars.length, ' ');
-  
-  console.log(loadingOneTop);
-  console.log(loadingOneMiddle);
-  console.log(loadingOneBottom);
-}
-
-function createLoadingFive() {
-  console.log('Generating...')
-  const loadingOneTop = createTopForAll('┏');
-  const loadingOneMiddle = createMiddleForAll('┃' , LENGTH, '▐');
-  const loadingOneBottom = createBottomForAll('┗');
-  
-  console.log(loadingOneTop);
-  console.log(loadingOneMiddle);
-  console.log(loadingOneBottom);
 }
 
 function createBoxBottom() {
@@ -139,33 +86,31 @@ function createBoxBottom() {
   return boxBottom + '┛';
 }
 
-function generatePassword(string) {
-  let updatedPassword = '';
-  
-  for (let index = 0; index < string.length; index++) {
-    const twoChar = +(string[index] + string[index + 1]);
-    const threeChar = +(string[index] + string[index + 1] + string[index + 2]);
-    const inRangeOfCaps = twoChar < 91 && twoChar > 64;
-    const inRangeOfSmalls = threeChar < 123 && threeChar > 100;
+function generatePassword(length) {
+  let char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let numbers = '123456789';
+  let generatedPassword = '';
 
-    if (inRangeOfSmalls || inRangeOfCaps) {
-      const inLetterCaps = String.fromCharCode(twoChar);
-      const inLetterSmall = String.fromCharCode(threeChar);
-      updatedPassword += inRangeOfCaps ? inLetterCaps : inLetterSmall;
-      continue;
+  for (let index = 0; index < length; index++) {
+    if (index === numbers.length) {
+      numbers += numbers;
     }
 
-    updatedPassword += string[index];
+    if (index === char.length) {
+      char += char;
+    }
+
+    generatedPassword += generateRandom(0, 2) === 0 ? char[index] : numbers[index];
   }
 
-  return updatedPassword;
+  return generatedPassword;
 }
 
 function createContentBoxBody() {
   while (confirm('\nWant to generate a password?')) {
-    const userInput = prompt('\nPassword of how many digits: ');
-    const initialPassword = Math.floor(Math.random() * (10 ** userInput));
-    const generatedPassword = generatePassword('' + initialPassword);
+    const length = +prompt('\nPassword of how many digits: ');
+
+    const generatedPassword = generatePassword(length);
 
     animate(4);
     console.log('\nYour generated password is:\n', generatedPassword);
@@ -185,7 +130,7 @@ function createBoxHead() {
 }
 
 function createHeading() {
-  let spaceBeforeAndNext = '';
+  let spaceBeforeAndNext = '\n';
 
   for (let index = 0; index < SPACE_SIZE; index++) {
     spaceBeforeAndNext += ' ';
@@ -195,13 +140,12 @@ function createHeading() {
   const boxTitle = '┃       PASSWORD GENERATOR       ┃';
   const boxBottom = createBoxBottom();
 
-  console.log(spaceBeforeAndNext + boxHead + spaceBeforeAndNext);
-  console.log(spaceBeforeAndNext + boxTitle + spaceBeforeAndNext);
-  console.log(spaceBeforeAndNext + boxBottom + spaceBeforeAndNext);
+  return (spaceBeforeAndNext + boxHead) + (spaceBeforeAndNext + boxTitle)
+  + (spaceBeforeAndNext + boxBottom);
 }
 
 function main() {
-  createHeading();
+  console.log(createHeading());
   createContentBoxBody();
 }
 
